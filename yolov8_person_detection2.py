@@ -1,5 +1,6 @@
 import cv2
 from ultralytics import YOLO
+import mediapipe_pose
 
 model = YOLO("yolov8s.pt")
 
@@ -32,6 +33,7 @@ while True:
     obj_list = model.names
     # print(obj_list)
 
+    count_person = 0
     if objs.shape[0] != 0:  # Check number of detected objs > 0
         current_frame = True
         for obj in objs:
@@ -39,8 +41,13 @@ while True:
             if detected_obj == "person":
                 x0, y0, x1, y1 = obj.xyxy[0].astype(int)
                 res = cv2.rectangle(res, (int(x0), int(y0)), (int(x1), int(y1)), (0, 0, 255), 2)
-                res = cv2.putText(res, f"{detected_obj}", (int(x0), int(y0 - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-                break
+                res = cv2.putText(res, f"{detected_obj}{count_person}", (int(x0), int(y0 - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+                
+                person_crop = frame[int(y0):int(y1), int(x0):int(x1)]
+                person_crop = mediapipe_pose.detect_pose(person_crop)
+                cv2.imshow(f'Person{count_person}', person_crop)
+                count_person += 1
+
 
     # Display the resulting frame
     cv2.imshow('Camera', res)

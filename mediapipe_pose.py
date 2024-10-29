@@ -1,27 +1,13 @@
 import cv2
 import mediapipe as mp
-from ultralytics import YOLO
-
-# Load the YOLOv8 model
-model = YOLO("yolov8s")
 
 # Initialize Mediapipe Pose and Drawing utilities
 mp_pose = mp.solutions.pose
 mp_drawing = mp.solutions.drawing_utils
 
-# Start video capture
-cap = cv2.VideoCapture(2)  # Use 0 for the default camera
-# Set resolution to 1280x720
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-
-# Initialize Pose object with default parameters
-with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:
-            break
-
+def detect_pose(frame):
+    # Initialize Pose object with default parameters
+    with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
         # Convert the frame to RGB (Mediapipe expects RGB images)
         image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
@@ -47,12 +33,8 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
                 print(f'Landmark {idx}: ({cx}, {cy})')
 
         # Show the frame with pose landmarks
-        cv2.imshow('Mediapipe Pose Estimation', image)
+        # cv2.imshow('Mediapipe Pose Estimation', image)
 
-        # Press 'q' to exit the loop
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+    return image
 
-# Release resources
-cap.release()
-cv2.destroyAllWindows()
+# cv2.destroyAllWindows()
